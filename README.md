@@ -6,7 +6,7 @@ Write less boilerplate and get less rerenders with `zustand`
 
 This package reduces the boilerplate needed to create a type-safe store in zustand:
 
-![alt text](comparison.gif)
+![alt text](https://github.com/PhilipWee/better-zustand-store/raw/next/comparison.gif?raw=true)
 
 ## API
 
