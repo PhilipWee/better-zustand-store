@@ -9,7 +9,8 @@
   ],
   "files": [
     "dist",
-    "src"
+    "src",
+    "comparison.gif"
   ],
   "license": "MIT",
   "author" :"Philip Wee",
