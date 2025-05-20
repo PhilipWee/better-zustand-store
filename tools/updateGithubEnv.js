@@ -1,21 +1,21 @@
-const readline = require('readline');
-const sodium = require('libsodium-wrappers');
+const readline = require("readline");
+const sodium = require("libsodium-wrappers");
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-const owner = 'PhilipWee';
-const repo = 'better-zustand-store';
+const owner = "PhilipWee";
+const repo = "better-zustand-store";
 
 function getGithubToken() {
   return new Promise((resolve) => {
     rl.question(
-      'Please enter your GitHub token (If you dont have one, find instructions in updateGithubEnv.js): ',
+      "Please enter your GitHub token (If you dont have one, find instructions in updateGithubEnv.js): ",
       (token) => {
         resolve(token.trim());
-      },
+      }
     );
   });
 }
@@ -24,7 +24,7 @@ async function updateGithubSecret(
   octokit,
   secretName,
   secretValue,
-  environment,
+  environment
 ) {
   try {
     // Get the public key for the repository
@@ -40,12 +40,12 @@ async function updateGithubSecret(
         }));
 
     if (secretValue === undefined) {
-      throw new Error('Secret value is undefined!');
+      throw new Error("Secret value is undefined!");
     }
 
     // Convert the secret value to a string if it's not already
     const secretString =
-      typeof secretValue === 'string'
+      typeof secretValue === "string"
         ? secretValue
         : JSON.stringify(secretValue);
 
@@ -53,13 +53,13 @@ async function updateGithubSecret(
     await sodium.ready;
     const binKey = sodium.from_base64(
       publicKey.key,
-      sodium.base64_variants.ORIGINAL,
+      sodium.base64_variants.ORIGINAL
     );
     const binSecret = sodium.from_string(secretString);
     const encBytes = sodium.crypto_box_seal(binSecret, binKey);
     const encryptedValue = sodium.to_base64(
       encBytes,
-      sodium.base64_variants.ORIGINAL,
+      sodium.base64_variants.ORIGINAL
     );
 
     // Update the secret
@@ -83,12 +83,12 @@ async function updateGithubSecret(
     }
 
     console.log(
-      `Successfully updated secret ${secretName} for environment ${environment}`,
+      `Successfully updated secret ${secretName} for environment ${environment}`
     );
   } catch (error) {
     console.error(
       `Error updating secret ${secretName} for environment ${environment}:`,
-      error,
+      error
     );
   }
 }
@@ -96,42 +96,19 @@ async function updateGithubSecret(
 async function main() {
   const token = await getGithubToken();
 
-  const { Octokit } = await import('@octokit/rest');
+  const { Octokit } = await import("@octokit/rest");
   const octokit = new Octokit({ auth: token });
 
-  const { getConfig } = await import('./generateEnvFile.js');
+  // Read from .env file
+  const dotenv = await import('dotenv');
+  dotenv.config();
 
-  const stagingConfig = {
-    environment: 'staging',
-    config: getConfig(['.env.base', '.env.staging']),
-  };
-
-  const productionConfig = {
-    environment: 'production',
-    config: getConfig(['.env.base', '.env.production']),
-  };
-
-  const configs = [stagingConfig, productionConfig];
-
-  for (const { environment, config } of configs) {
-    const envVars = Object.entries(config)
-      .map(([key, val]) => `${key}=${val}`)
-      .join('\n');
-
-    await updateGithubSecret(octokit, 'ENV_VARS', envVars, environment);
-  }
-
-  const additionalKeys = [
-    'NX_CHROME_EXTENSION_ID',
-    'NX_CHROME_EXTENSION_GITHUB_CICD_CLIENT_ID',
-    'NX_CHROME_EXTENSION_GITHUB_CICD_CLIENT_SECRET',
-    'NX_CHROME_EXTENSION_GITHUB_CICD_REFRESH_TOKEN',
-  ];
+  const additionalKeys = ["NPM_TOKEN", "GH_ACCESS_TOKEN"];
   for (const additionalKey of additionalKeys) {
     await updateGithubSecret(
       octokit,
       additionalKey,
-      productionConfig.config[additionalKey],
+      process.env[additionalKey]
     );
   }
 
