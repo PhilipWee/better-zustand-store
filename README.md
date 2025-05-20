@@ -11,7 +11,7 @@ This package reduces the boilerplate needed to create a type-safe store in zusta
 ## API
 
 ### Creating a store
-
+ 
 ```tsx
 const store = createBetterStore({
   age: 0, //Number type inferred
