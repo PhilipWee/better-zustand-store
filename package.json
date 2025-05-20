@@ -9,7 +9,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "clean": "rimraf dist docs/v2",
+    "clean": "rimraf dist",
     "format": "prettier --write \"{src,test}/**/*.ts\"",
     "test": "npm run test:run",
     "test:run": "jest --runInBand",
