@@ -10,7 +10,7 @@ test("should rerender component on subscribed state change", () => {
   const RenderTester = () => {
     const val = store.use("val");
     renderCount += 1;
-    return <></>;
+    return <>{val}</>;
   };
   render(<RenderTester />);
   act(() => {
@@ -27,7 +27,7 @@ test("should not rerender if state changes for other variable", () => {
   const RenderTester = () => {
     const val = store.use("val1");
     renderCount += 1;
-    return <></>;
+    return <>{val}</>;
   };
   render(<RenderTester />);
   act(() => {
